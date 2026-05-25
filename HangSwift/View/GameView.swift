@@ -39,11 +39,20 @@ struct GameView: View {
             )
             .tracking(8)
             .foregroundStyle(
-                viewModel.isGameLost
+
+                viewModel.isGameWon
+                ? .green
+
+                : viewModel.isGameLost
                 ? .red
+
                 : .primary
             )
-            .scaleEffect(viewModel.isGameLost ? 1.1 : 1)
+            .scaleEffect(
+                viewModel.isGameWon || viewModel.isGameLost
+                ? 1.1
+                : 1
+            )
             .padding(.vertical, 24)
             .animation(
                 .easeInOut,
