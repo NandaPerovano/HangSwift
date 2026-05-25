@@ -58,6 +58,9 @@ struct GameView: View {
             Spacer()
         }
         .padding()
+        .background(
+            Color(.systemGroupedBackground)
+        )
         .navigationTitle("Palavra Secreta")
         .navigationBarTitleDisplayMode(.inline)
         .alert(

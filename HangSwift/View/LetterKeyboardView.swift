@@ -38,9 +38,15 @@ struct LetterKeyboardView: View {
                         .background(
                             guessedLetters.contains(letter)
                             ? Color.gray.opacity(0.5)
-                            : Color.blue
+                            : Color.indigo
                         )
                         .clipShape(Circle())
+                        .shadow(
+                            color: .indigo.opacity(0.2),
+                            radius: 4,
+                            x: 0,
+                            y: 3
+                        )
                 }
                 .disabled(guessedLetters.contains(letter))
             }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    
+
     @State private var animateIcon = false
 
     var body: some View {
@@ -18,14 +18,14 @@ struct HomeView: View {
             VStack(spacing: 32) {
 
                 Spacer()
-                      
+
                 Image(systemName: "gamecontroller.fill")
                     .font(.system(size: 80))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.indigo)
                     .scaleEffect(animateIcon ? 1.1 : 0.95)
                     .offset(y: animateIcon ? -8 : 8)
                     .shadow(
-                        color: .blue.opacity(0.3),
+                        color: .indigo.opacity(0.3),
                         radius: 12,
                         x: 0,
                         y: 8
@@ -58,14 +58,23 @@ struct HomeView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.indigo)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(
+                            color: .indigo.opacity(0.25),
+                            radius: 10,
+                            x: 0,
+                            y: 6
+                        )
                 }
                 .padding(.horizontal, 32)
 
                 Spacer()
             }
             .padding()
+            .background(
+                Color(.systemGroupedBackground)
+            )
             .navigationBarHidden(true)
         }
     }
