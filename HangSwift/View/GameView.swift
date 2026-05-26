@@ -41,8 +41,16 @@ struct GameView: View {
 
                 Spacer()
 
-                Color.clear
-                    .frame(width: 20)
+                Button {
+
+                    viewModel.restartGame()
+
+                } label: {
+
+                    Image(systemName: "arrow.clockwise")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                }
             }
             .padding(.horizontal)
 
@@ -60,17 +68,25 @@ struct GameView: View {
             // PALAVRA
             Text(
                 viewModel.isGameLost
-                ? viewModel.game.word
+                ? viewModel.formattedResultWord
                 : viewModel.formattedWord
             )
             .font(
                 .system(
-                    size: 46,
+                    size: 42,
                     weight: .heavy,
                     design: .rounded
                 )
             )
-            .tracking(8)
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .minimumScaleFactor(0.6)
+            .padding(.horizontal, 24)
+            .tracking(
+                viewModel.game.word.count > 8
+                ? 4
+                : 8
+            )
             .foregroundStyle(
 
                 viewModel.isGameWon

@@ -48,6 +48,29 @@ final class HangmanViewModel: ObservableObject {
         .joined(separator: " ")
     }
 
+    var formattedResultWord: String {
+
+        let word = game.word
+
+        guard word.count > 8 else {
+            return word
+        }
+
+        let middleIndex =
+            word.index(
+                word.startIndex,
+                offsetBy: word.count / 2
+            )
+
+        let firstPart =
+            String(word[..<middleIndex])
+
+        let secondPart =
+            String(word[middleIndex...])
+
+        return "\(firstPart)\n\(secondPart)"
+    }
+
     var wrongAttempts: Int {
         game.wrongAttempts
     }

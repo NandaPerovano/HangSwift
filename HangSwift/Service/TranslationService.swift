@@ -39,6 +39,25 @@ final class TranslationService {
             from: data
         )
 
-        return decoded.responseData.translatedText.uppercased()
+        let translated =
+            decoded.responseData.translatedText
+            .trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+
+        // evita traduções iguais
+        if translated.lowercased() ==
+            word.lowercased() {
+
+            return "Sem tradução"
+        }
+
+        // evita traduções muito estranhas/vazias
+        if translated.isEmpty {
+
+            return "Sem tradução"
+        }
+
+        return translated.uppercased()
     }
 }
