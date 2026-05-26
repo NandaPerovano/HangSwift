@@ -101,7 +101,7 @@ final class HangmanViewModel: ObservableObject {
             Task {
 
                 try? await Task.sleep(
-                    nanoseconds: 800_000_000
+                    nanoseconds: 2_000_000_000
                 )
 
                 showResultAlert = true

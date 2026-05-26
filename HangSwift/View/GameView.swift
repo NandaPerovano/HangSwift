@@ -57,6 +57,7 @@ struct GameView: View {
             )
             .frame(height: 220)
 
+            // PALAVRA
             Text(
                 viewModel.isGameLost
                 ? viewModel.game.word
@@ -64,8 +65,8 @@ struct GameView: View {
             )
             .font(
                 .system(
-                    size: 36,
-                    weight: .bold,
+                    size: 46,
+                    weight: .heavy,
                     design: .rounded
                 )
             )
@@ -79,6 +80,17 @@ struct GameView: View {
                 ? .red
 
                 : .white
+            )
+            .shadow(
+                color:
+                    viewModel.isGameWon
+                    ? .green.opacity(0.7)
+
+                    : viewModel.isGameLost
+                    ? .red.opacity(0.7)
+
+                    : .white.opacity(0.2),
+                radius: 12
             )
             .scaleEffect(
                 viewModel.isGameWon || viewModel.isGameLost
@@ -101,14 +113,26 @@ struct GameView: View {
                 }
             )
 
+            // TRADUÇÃO
             if viewModel.isGameWon || viewModel.isGameLost {
 
-                Text(
-                    "Tradução: \(viewModel.translatedWord)"
-                )
-                .font(.headline)
-                .foregroundStyle(.gray)
-                .padding(.top, 8)
+                VStack(spacing: 6) {
+
+                    Text("TRADUÇÃO")
+                        .font(.caption)
+                        .foregroundStyle(.gray)
+
+                    Text(viewModel.translatedWord)
+                        .font(
+                            .system(
+                                size: 28,
+                                weight: .bold,
+                                design: .rounded
+                            )
+                        )
+                        .foregroundStyle(.white)
+                }
+                .padding(.top, 16)
                 .transition(.opacity)
             }
 
