@@ -14,10 +14,14 @@ final class HangmanViewModel: ObservableObject {
 
     @Published private(set) var game: HangmanGame
     @Published var showResultAlert = false
+    @Published var translatedWord = ""
 
     // MARK: - Properties
 
     private let wordService = WordAPIService()
+
+    private let translationService =
+        TranslationService()
 
     // MARK: - Init
 
@@ -64,7 +68,9 @@ final class HangmanViewModel: ObservableObject {
     }
 
     var resultTitle: String {
-        isGameWon ? "Você venceu!" : "Você perdeu!"
+        isGameWon
+        ? "Você venceu!"
+        : "Você perdeu!"
     }
 
     var resultMessage: String {
@@ -95,7 +101,7 @@ final class HangmanViewModel: ObservableObject {
             Task {
 
                 try? await Task.sleep(
-                    nanoseconds: 1_200_000_000
+                    nanoseconds: 800_000_000
                 )
 
                 showResultAlert = true
@@ -118,15 +124,30 @@ final class HangmanViewModel: ObservableObject {
 
         do {
 
-            let fetchedWord = try await wordService.fetchWord()
+            let fetchedWord =
+                try await wordService.fetchWord()
 
-            self.game = HangmanGame(word: fetchedWord)
+            self.game = HangmanGame(
+                word: fetchedWord
+            )
+
+            self.translatedWord =
+                try await translationService.translate(
+                    word: fetchedWord
+                )
 
         } catch {
 
-            print("Erro ao buscar palavra:", error)
+            print(
+                "Erro ao buscar palavra:",
+                error
+            )
 
-            self.game = HangmanGame(word: "SWIFT")
+            self.game = HangmanGame(
+                word: "SWIFT"
+            )
+
+            self.translatedWord = "SWIFT"
         }
     }
 }

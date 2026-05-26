@@ -41,7 +41,6 @@ struct GameView: View {
 
                 Spacer()
 
-                // balanceamento visual
                 Color.clear
                     .frame(width: 20)
             }
@@ -102,10 +101,24 @@ struct GameView: View {
                 }
             )
 
+            if viewModel.isGameWon || viewModel.isGameLost {
+
+                Text(
+                    "Tradução: \(viewModel.translatedWord)"
+                )
+                .font(.headline)
+                .foregroundStyle(.gray)
+                .padding(.top, 8)
+                .transition(.opacity)
+            }
+
             Spacer()
         }
         .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity
+        )
         .background(
             Color.black.ignoresSafeArea()
         )
