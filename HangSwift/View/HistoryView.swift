@@ -32,7 +32,7 @@ struct HistoryView: View {
                         .foregroundStyle(.white)
                 }
                 
-                Text("Palavras")
+                Text("Suas Palavras")
                     .font(.title3.bold())
                     .foregroundStyle(.white)
                 

@@ -57,7 +57,7 @@ final class TranslationService {
                 options: .regularExpression
             )
 
-        // remove entidades estranhas
+        // remove entidades HTML
         translated =
             translated.replacingOccurrences(
                 of: "&quot;",
@@ -70,6 +70,23 @@ final class TranslationService {
                 with: "&"
             )
 
+        // remove conteúdo entre parênteses
+        if let parenthesisIndex =
+            translated.firstIndex(of: "(") {
+
+            translated =
+                String(
+                    translated[..<parenthesisIndex]
+                )
+        }
+
+        // remove pontuação
+        translated =
+            translated.trimmingCharacters(
+                in: CharacterSet.punctuationCharacters
+            )
+
+        // remove espaços extras
         translated =
             translated.trimmingCharacters(
                 in: .whitespacesAndNewlines
@@ -82,16 +99,11 @@ final class TranslationService {
             return "Sem tradução"
         }
 
-        // evita vazios
+        // evita vazio
         if translated.isEmpty {
 
             return "Sem tradução"
         }
-
-        translated =
-            translated.trimmingCharacters(
-                in: CharacterSet.punctuationCharacters
-            )
 
         return translated.uppercased()
     }
