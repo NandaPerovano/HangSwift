@@ -32,31 +32,66 @@ final class TranslationService {
             throw URLError(.badURL)
         }
 
-        let (data, _) = try await URLSession.shared.data(from: url)
+        let (data, _) =
+            try await URLSession.shared.data(
+                from: url
+            )
 
-        let decoded = try JSONDecoder().decode(
-            TranslationResponse.self,
-            from: data
-        )
+        let decoded =
+            try JSONDecoder().decode(
+                TranslationResponse.self,
+                from: data
+            )
 
-        let translated =
+        var translated =
             decoded.responseData.translatedText
             .trimmingCharacters(
                 in: .whitespacesAndNewlines
             )
 
-        // evita traduções iguais
+        // remove tags HTML/XML
+        translated =
+            translated.replacingOccurrences(
+                of: "<[^>]+>",
+                with: "",
+                options: .regularExpression
+            )
+
+        // remove entidades estranhas
+        translated =
+            translated.replacingOccurrences(
+                of: "&quot;",
+                with: "\""
+            )
+
+        translated =
+            translated.replacingOccurrences(
+                of: "&amp;",
+                with: "&"
+            )
+
+        translated =
+            translated.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+
+        // evita tradução igual
         if translated.lowercased() ==
             word.lowercased() {
 
             return "Sem tradução"
         }
 
-        // evita traduções muito estranhas/vazias
+        // evita vazios
         if translated.isEmpty {
 
             return "Sem tradução"
         }
+
+        translated =
+            translated.trimmingCharacters(
+                in: CharacterSet.punctuationCharacters
+            )
 
         return translated.uppercased()
     }

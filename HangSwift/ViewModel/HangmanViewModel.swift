@@ -15,6 +15,7 @@ final class HangmanViewModel: ObservableObject {
     @Published private(set) var game: HangmanGame
     @Published var showResultAlert = false
     @Published var translatedWord = ""
+    @Published var history: [HistoryItem] = []
 
     // MARK: - Properties
 
@@ -121,10 +122,12 @@ final class HangmanViewModel: ObservableObject {
 
         if isGameWon || isGameLost {
 
+            saveHistory()
+
             Task {
 
                 try? await Task.sleep(
-                    nanoseconds: 2_000_000_000
+                    nanoseconds: 1_000_000_000
                 )
 
                 showResultAlert = true
@@ -142,6 +145,17 @@ final class HangmanViewModel: ObservableObject {
     }
 
     // MARK: - Private
+
+    private func saveHistory() {
+
+        let item = HistoryItem(
+            englishWord: game.word,
+            translatedWord: translatedWord,
+            isCorrect: isGameWon
+        )
+
+        history.insert(item, at: 0)
+    }
 
     private func loadNewWord() async {
 

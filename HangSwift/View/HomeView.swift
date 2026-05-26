@@ -28,7 +28,7 @@ struct HomeView: View {
                     )
                     .foregroundStyle(.white)
 
-                Text("Descubra a palavra antes da forca ser completada.")
+                Text("Descubra palavras em inglês, aprenda traduções e desafie sua memória.")
                     .font(.headline)
                     .foregroundStyle(.gray)
                     .multilineTextAlignment(.center)

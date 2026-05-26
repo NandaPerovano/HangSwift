@@ -35,21 +35,39 @@ struct GameView: View {
 
                 Spacer()
 
-                Text("Palavra Secreta")
-                    .font(.title3.bold())
-                    .foregroundStyle(.white)
+                HStack(spacing: 20) {
 
-                Spacer()
+                    NavigationLink {
 
-                Button {
+                        HistoryView(
+                            history: viewModel.history
+                        )
 
-                    viewModel.restartGame()
+                    } label: {
 
-                } label: {
+                        HStack(spacing: 6) {
 
-                    Image(systemName: "arrow.clockwise")
-                        .font(.headline)
+                            Image(
+                                systemName:
+                                    "list.bullet.rectangle.portrait"
+                            )
+
+                            Text("Suas Palavras")
+                                .font(.subheadline.bold())
+                        }
                         .foregroundStyle(.white)
+                    }
+
+                    Button {
+
+                        viewModel.restartGame()
+
+                    } label: {
+
+                        Image(systemName: "arrow.clockwise")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
                 }
             }
             .padding(.horizontal)
