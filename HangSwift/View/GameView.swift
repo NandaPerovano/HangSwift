@@ -86,7 +86,7 @@ struct GameView: View {
             // PALAVRA
             Text(
                 viewModel.isGameLost
-                ? viewModel.formattedResultWord
+                ? viewModel.game.word
                 : viewModel.formattedWord
             )
             .font(
@@ -97,8 +97,9 @@ struct GameView: View {
                 )
             )
             .multilineTextAlignment(.center)
-            .lineLimit(2)
-            .minimumScaleFactor(0.6)
+            .lineLimit(1)
+            .minimumScaleFactor(0.55)
+            .allowsTightening(true)
             .padding(.horizontal, 24)
             .tracking(
                 viewModel.game.word.count > 8
