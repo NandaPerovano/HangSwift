@@ -9,41 +9,28 @@ import SwiftUI
 
 struct HomeView: View {
 
-    @State private var animateIcon = false
-
     var body: some View {
 
         NavigationStack {
 
-            VStack(spacing: 32) {
+            VStack(spacing: 20) {
 
                 Spacer()
 
-                Image(systemName: "gamecontroller.fill")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.indigo)
-                    .scaleEffect(animateIcon ? 1.1 : 0.95)
-                    .offset(y: animateIcon ? -8 : 8)
-                    .shadow(
-                        color: .indigo.opacity(0.3),
-                        radius: 12,
-                        x: 0,
-                        y: 8
-                    )
-                    .animation(
-                        .easeInOut(duration: 1.5)
-                        .repeatForever(autoreverses: true),
-                        value: animateIcon
-                    )
-                    .onAppear {
-                        animateIcon = true
-                    }
+                AnimatedHangmanView()
 
                 Text("Palavra Secreta")
-                    .font(.system(size: 42, weight: .bold))
+                    .font(
+                        .system(
+                            size: 42,
+                            weight: .bold
+                        )
+                    )
+                    .foregroundStyle(.white)
 
                 Text("Descubra a palavra antes da forca ser completada.")
                     .font(.headline)
+                    .foregroundStyle(.gray)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
 
@@ -58,13 +45,26 @@ struct HomeView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.indigo)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    .indigo,
+                                    .purple
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 16
+                            )
+                        )
                         .shadow(
-                            color: .indigo.opacity(0.25),
-                            radius: 10,
+                            color: .indigo.opacity(0.35),
+                            radius: 12,
                             x: 0,
-                            y: 6
+                            y: 8
                         )
                 }
                 .padding(.horizontal, 32)
@@ -72,8 +72,9 @@ struct HomeView: View {
                 Spacer()
             }
             .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(
-                Color(.systemGroupedBackground)
+                Color.black.ignoresSafeArea()
             )
             .navigationBarHidden(true)
         }
