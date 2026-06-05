@@ -20,14 +20,11 @@ final class HangmanViewModel: ObservableObject {
     // MARK: - Properties
 
     private let wordService = WordAPIService()
-
-    private let translationService =
-        TranslationService()
+    private let translationService = TranslationService()
 
     // MARK: - Init
 
     init() {
-
         self.game = HangmanGame(word: "SWIFT")
 
         Task {
@@ -38,36 +35,28 @@ final class HangmanViewModel: ObservableObject {
     // MARK: - Computed Properties
 
     var formattedWord: String {
-
         game.word.map { letter in
-
             game.guessedLetters.contains(letter)
             ? String(letter)
             : "_"
-
         }
         .joined(separator: " ")
     }
 
     var formattedResultWord: String {
-
         let word = game.word
 
         guard word.count > 8 else {
             return word
         }
 
-        let middleIndex =
-            word.index(
-                word.startIndex,
-                offsetBy: word.count / 2
-            )
+        let middleIndex = word.index(
+            word.startIndex,
+            offsetBy: word.count / 2
+        )
 
-        let firstPart =
-            String(word[..<middleIndex])
-
-        let secondPart =
-            String(word[middleIndex...])
+        let firstPart = String(word[..<middleIndex])
+        let secondPart = String(word[middleIndex...])
 
         return "\(firstPart)\n\(secondPart)"
     }
@@ -81,7 +70,6 @@ final class HangmanViewModel: ObservableObject {
     }
 
     var isGameWon: Bool {
-
         game.word.allSatisfy {
             game.guessedLetters.contains($0)
         }
@@ -92,13 +80,10 @@ final class HangmanViewModel: ObservableObject {
     }
 
     var resultTitle: String {
-        isGameWon
-        ? "Você venceu!"
-        : "Você perdeu!"
+        isGameWon ? "Você venceu!" : "Você perdeu!"
     }
 
     var resultMessage: String {
-
         isGameWon
         ? "Parabéns! Você acertou a palavra."
         : "A palavra era \(game.word)"
@@ -120,15 +105,15 @@ final class HangmanViewModel: ObservableObject {
             game.wrongAttempts += 1
         }
 
+        // Lógica de finalização do jogo modificada com Delay controlado
         if isGameWon || isGameLost {
 
             saveHistory()
 
             Task {
-
-                try? await Task.sleep(
-                    nanoseconds: 1_000_000_000
-                )
+                // Modificado: 2_000_000_000 nanoseconds = 2 segundos de espera.
+                // Esse tempo permite que o usuário veja a tradução na GameView antes do Alerta bloquear a tela.
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
 
                 showResultAlert = true
             }
@@ -136,7 +121,6 @@ final class HangmanViewModel: ObservableObject {
     }
 
     func restartGame() {
-
         showResultAlert = false
 
         Task {
@@ -147,7 +131,6 @@ final class HangmanViewModel: ObservableObject {
     // MARK: - Private
 
     private func saveHistory() {
-
         let item = HistoryItem(
             englishWord: game.word,
             translatedWord: translatedWord,
@@ -158,27 +141,19 @@ final class HangmanViewModel: ObservableObject {
     }
 
     private func loadNewWord() async {
-
         do {
-
-            let fetchedWord =
-                try await wordService.fetchWord()
+            let fetchedWord = try await wordService.fetchWord()
 
             self.game = HangmanGame(
                 word: fetchedWord
             )
 
-            self.translatedWord =
-                try await translationService.translate(
-                    word: fetchedWord
-                )
+            self.translatedWord = try await translationService.translate(
+                word: fetchedWord
+            )
 
         } catch {
-
-            print(
-                "Erro ao buscar palavra:",
-                error
-            )
+            print("Erro ao buscar palavra:", error)
 
             self.game = HangmanGame(
                 word: "SWIFT"

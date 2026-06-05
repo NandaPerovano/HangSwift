@@ -23,19 +23,15 @@ struct HistoryView: View {
 
         VStack(spacing: 0) {
 
-            // HEADER
-
-            HStack {
-
+            // HEADER (Ajustado o respiro e espaçamento)
+            HStack(spacing: 12) {
                 Button {
-
                     dismiss()
-
                 } label: {
-
                     Image(systemName: "chevron.left")
                         .font(.headline)
                         .foregroundStyle(.white)
+                        .padding(.leading, 4) // Evita que fique colado na borda da tela
                 }
 
                 Text("Suas Palavras")
@@ -45,10 +41,10 @@ struct HistoryView: View {
                 Spacer()
             }
             .padding(.horizontal)
-            .padding(.top)
+            .padding(.top, 16) // Um pouco mais de espaço abaixo da status bar
+            .padding(.bottom, 12)
 
             // LISTA
-
             ScrollView {
 
                 LazyVStack(
@@ -60,8 +56,7 @@ struct HistoryView: View {
                         VStack(spacing: 12) {
 
                             Image(
-                                systemName:
-                                    "text.book.closed"
+                                systemName: "text.book.closed"
                             )
                             .font(
                                 .system(size: 40)
@@ -85,36 +80,37 @@ struct HistoryView: View {
                                     alignment: .leading,
                                     spacing: 6
                                 ) {
+                                    // 1. FORMATAÇÃO DE TEXTO: Transforma "AMENABLE" em "Amenable"
+                                    Text(item.englishWord.capitalized)
+                                        .font(.headline)
+                                        .foregroundStyle(.white)
 
-                                    Text(
-                                        item.englishWord
-                                    )
-                                    .font(.headline)
-                                    .foregroundStyle(.white)
-
-                                    Text(
-                                        item.translatedWord
-                                    )
-                                    .font(.subheadline)
-                                    .foregroundStyle(.gray)
+                                    // 2. FILTRO INTELIGENTE: Esconde o subtítulo se não houver tradução válida
+                                    if !item.translatedWord.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+                                        item.translatedWord.lowercased() != "sem tradução" {
+                                        
+                                        Text(item.translatedWord.capitalized)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.gray)
+                                    }
                                 }
 
                                 Spacer()
 
-                                Circle()
-                                    .fill(
-                                        item.isCorrect
-                                        ? .green
-                                        : .red
-                                    )
-                                    .frame(
-                                        width: 14,
-                                        height: 14
-                                    )
+                                // 3. ACESSIBILIDADE: Círculo indicador agora contém ícones visuais (visto em image_8cd3e4.png)
+                                ZStack {
+                                    Circle()
+                                        .fill(item.isCorrect ? .green : .red)
+                                        .frame(width: 20, height: 20)
+                                    
+                                    Image(systemName: item.isCorrect ? "checkmark" : "xmark")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                }
                             }
                             .padding()
                             .background(
-                                Color.white.opacity(0.03)
+                                Color.white.opacity(0.04) // Leve aumento para destacar no fundo puramente preto
                             )
                             .clipShape(
                                 RoundedRectangle(
@@ -124,11 +120,11 @@ struct HistoryView: View {
                         }
                     }
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.bottom, 16)
             }
 
             // BOTÃO FIXO
-
             NavigationLink {
 
                 PracticeView(
@@ -140,8 +136,7 @@ struct HistoryView: View {
                 HStack {
 
                     Image(
-                        systemName:
-                            "brain.head.profile"
+                        systemName: "brain.head.profile"
                     )
 
                     Text("Treinar Palavras")
@@ -167,8 +162,7 @@ struct HistoryView: View {
                     )
                 )
                 .shadow(
-                    color:
-                        .indigo.opacity(0.35),
+                    color: .indigo.opacity(0.35),
                     radius: 12,
                     x: 0,
                     y: 8
