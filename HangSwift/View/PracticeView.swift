@@ -33,50 +33,111 @@ struct PracticeView: View {
             )
     }
 
+    // MARK: - Statistics
+
+    private var totalAttempts: Int {
+
+        guard let stats = stats.first else {
+            return 0
+        }
+
+        return
+            stats.correctAnswers +
+            stats.wrongAnswers
+    }
+
+    private var successRate: Int {
+
+        guard let stats = stats.first else {
+            return 0
+        }
+
+        let total =
+            stats.correctAnswers +
+            stats.wrongAnswers
+
+        guard total > 0 else {
+            return 0
+        }
+
+        return Int(
+            (
+                Double(stats.correctAnswers)
+                /
+                Double(total)
+            ) * 100
+        )
+    }
+
+    private var ranking: String {
+
+        switch successRate {
+
+        case 90...:
+            return "👑 Mestre das Palavras"
+
+        case 75..<90:
+            return "🏆 Especialista"
+
+        case 60..<75:
+            return "🚀 Aprendiz Avançado"
+
+        case 40..<60:
+            return "📚 Estudante"
+
+        default:
+            return "🌱 Iniciante"
+        }
+    }
+
     var body: some View {
 
-        VStack(spacing: 24) {
+        ScrollView {
 
-            // HEADER
+            VStack(spacing: 24) {
 
-            HStack {
+                // HEADER
 
-                Button {
+                HStack {
 
-                    dismiss()
+                    Button {
 
-                } label: {
+                        dismiss()
 
-                    Image(systemName: "chevron.left")
-                        .foregroundStyle(.white)
-                }
+                    } label: {
 
-                Text("Treinar Palavras")
-                    .font(.title3.bold())
-                    .foregroundStyle(.white)
-
-                Spacer()
-            }
-            .padding(.horizontal)
-
-            Spacer()
-
-            if let word = viewModel.currentWord {
-
-                Text("Traduza para inglês")
-                    .font(.headline)
-                    .foregroundStyle(.gray)
-
-                Text(word.translatedWord)
-                    .font(
-                        .system(
-                            size: 36,
-                            weight: .bold
+                        Image(
+                            systemName: "chevron.left"
                         )
-                    )
-                    .foregroundStyle(.white)
+                        .foregroundStyle(.white)
+                    }
 
-                Text(viewModel.formattedAnswer)
+                    Text("Treinar Palavras")
+                        .font(.title3.bold())
+                        .foregroundStyle(.white)
+
+                    Spacer()
+                }
+                .padding(.horizontal)
+
+                if let word = viewModel.currentWord {
+
+                    Text("Traduza para inglês")
+                        .font(.headline)
+                        .foregroundStyle(.gray)
+
+                    Text(word.translatedWord)
+                        .font(
+                            .system(
+                                size: 36,
+                                weight: .bold
+                            )
+                        )
+                        .foregroundStyle(.white)
+
+                    Text(
+                        viewModel.formattedAnswer
+                    )
                     .font(
                         .system(
                             size: 34,
@@ -85,68 +146,78 @@ struct PracticeView: View {
                         )
                     )
                     .foregroundStyle(.green)
+                    .multilineTextAlignment(.center)
 
-                PracticeKeyboardView(
+                    PracticeKeyboardView(
 
-                    answer: viewModel.answer,
+                        answer:
+                            viewModel.answer,
 
-                    targetWord:
-                        word.englishWord,
+                        targetWord:
+                            word.englishWord,
 
-                    onTapLetter: {
+                        onTapLetter: {
 
-                        viewModel.addLetter($0)
-                    },
+                            viewModel.addLetter(
+                                $0
+                            )
+                        },
 
-                    onDelete: {
+                        onDelete: {
 
-                        viewModel.removeLastLetter()
-                    }
-                )
-
-                Button {
-
-                    let isCorrect =
-                        viewModel.checkAnswer()
-
-                    updateStats(
-                        correct: isCorrect
+                            viewModel.removeLastLetter()
+                        }
                     )
 
-                } label: {
+                    Button {
 
-                    Text("Verificar")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.indigo)
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 16
+                        let isCorrect =
+                            viewModel.checkAnswer()
+
+                        updateStats(
+                            correct: isCorrect
+                        )
+
+                    } label: {
+
+                        Text("Verificar")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(
+                                maxWidth: .infinity
                             )
-                        )
-                }
+                            .padding()
+                            .background(.indigo)
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 16
+                                )
+                            )
+                    }
 
-                if viewModel.showResult {
+                    if viewModel.showResult {
 
-                    VStack(spacing: 12) {
+                        VStack(spacing: 12) {
 
-                        Text(
-                            viewModel.resultMessage
-                        )
-                        .foregroundStyle(.white)
+                            Text(
+                                viewModel.resultMessage
+                            )
+                            .foregroundStyle(.white)
 
-                        Button {
+                            Button {
 
-                            viewModel.nextWord()
+                                viewModel.nextWord()
 
-                        } label: {
+                            } label: {
 
-                            Text("Próxima Palavra")
+                                Text(
+                                    "Próxima Palavra"
+                                )
                                 .font(.headline)
                                 .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
+                                .frame(
+                                    maxWidth: .infinity
+                                )
                                 .padding()
                                 .background(.green)
                                 .clipShape(
@@ -154,18 +225,18 @@ struct PracticeView: View {
                                         cornerRadius: 16
                                     )
                                 )
+                            }
                         }
                     }
                 }
-            }
 
-            Spacer()
+                Divider()
+                    .overlay(.gray.opacity(0.3))
+                    .padding(.vertical)
 
-            // ESTATÍSTICAS SALVAS
+                // CONTADORES
 
-            if let stats = stats.first {
-
-                VStack(spacing: 12) {
+                if let stats = stats.first {
 
                     HStack {
 
@@ -185,69 +256,87 @@ struct PracticeView: View {
                         )
                         .foregroundStyle(.red)
                     }
+                    .padding(.horizontal)
 
-                    let total =
-                        stats.correctAnswers +
-                        stats.wrongAnswers
+                } else {
 
-                    if total > 0 {
+                    HStack {
 
-                        let percentage =
-                            Int(
-                                (
-                                    Double(
-                                        stats.correctAnswers
-                                    )
-                                    /
-                                    Double(total)
-                                ) * 100
-                            )
+                        Label(
+                            "0",
+                            systemImage:
+                                "checkmark.circle.fill"
+                        )
+                        .foregroundStyle(.green)
 
-                        HStack {
+                        Spacer()
 
-                            Label(
-                                "\(percentage)% de acerto",
-                                systemImage:
-                                    "chart.line.uptrend.xyaxis"
-                            )
-                            .font(.caption)
-
-                            Spacer()
-                        }
-                        .foregroundStyle(.gray)
+                        Label(
+                            "0",
+                            systemImage:
+                                "xmark.circle.fill"
+                        )
+                        .foregroundStyle(.red)
                     }
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
 
-            } else {
+                // CARD DE DESEMPENHO
 
-                HStack {
+                VStack(spacing: 14) {
 
-                    Label(
-                        "0",
-                        systemImage:
-                            "checkmark.circle.fill"
+                    Text("🏆 Seu Desempenho")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+
+                    Text("\(successRate)%")
+                        .font(
+                            .system(
+                                size: 48,
+                                weight: .bold
+                            )
+                        )
+                        .foregroundStyle(.green)
+
+                    Text("Taxa de acerto")
+                        .foregroundStyle(.gray)
+
+                    Divider()
+                        .overlay(
+                            .gray.opacity(0.3)
+                        )
+
+                    Text(ranking)
+                        .font(.title3.bold())
+                        .foregroundStyle(.yellow)
+
+                    Text(
+                        "\(totalAttempts) tentativas realizadas"
                     )
-                    .foregroundStyle(.green)
-
-                    Spacer()
-
-                    Label(
-                        "0",
-                        systemImage:
-                            "xmark.circle.fill"
-                    )
-                    .foregroundStyle(.red)
+                    .font(.caption)
+                    .foregroundStyle(.gray)
                 }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(
+                    Color.white.opacity(0.05)
+                )
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 20
+                    )
+                )
                 .padding(.horizontal)
             }
+            .padding()
         }
-        .padding()
         .background(
             Color.black.ignoresSafeArea()
         )
         .navigationBarHidden(true)
     }
+
+    // MARK: - Persistence
 
     private func updateStats(
         correct: Bool
