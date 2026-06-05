@@ -30,75 +30,100 @@ struct PracticeView: View {
         )
     }
 
-    // MARK: - Stats
+    // MARK: - Geral Stats (Histórico Global)
 
     private var totalAttempts: Int {
-        guard let stats = stats.first else {
-            return 0
-        }
+        guard let stats = stats.first else { return 0 }
         return stats.correctAnswers + stats.wrongAnswers
     }
 
     private var successRate: Int {
-        guard let stats = stats.first else {
-            return 0
-        }
-
+        guard let stats = stats.first else { return 0 }
         let total = stats.correctAnswers + stats.wrongAnswers
-
-        guard total > 0 else {
-            return 0
-        }
-
+        guard total > 0 else { return 0 }
         return Int((Double(stats.correctAnswers) / Double(total)) * 100)
     }
 
     private var ranking: String {
         switch successRate {
-        case 90...:
-            return "👑 Mestre das Palavras"
-        case 75..<90:
-            return "🏆 Especialista"
-        case 60..<75:
-            return "🚀 Aprendiz Avançado"
-        case 40..<60:
-            return "📚 Estudante"
-        default:
-            return "🌱 Iniciante"
+        case 90...: return "👑 Mestre das Palavras"
+        case 75..<90: return "🏆 Especialista"
+        case 60..<75: return "🚀 Aprendiz Avançado"
+        case 40..<60: return "📚 Estudante"
+        default: return "🌱 Iniciante"
         }
     }
 
     var body: some View {
         VStack(spacing: 0) {
             
-            // HEADER (Fixo no topo, fora do ScrollView)
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.headline)
+            // HEADER (Totalmente fixo fora do scroll)
+            VStack(spacing: 14) {
+                HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
+
+                    Text("Treinar Palavras")
+                        .font(.title3.bold())
                         .foregroundStyle(.white)
+
+                    Spacer()
+                    
+                    // Elemento do Streak 🔥 dinâmico vindo do ViewModel
+                    if viewModel.currentStreak > 0 {
+                        HStack(spacing: 4) {
+                            Text("🔥")
+                            Text("\(viewModel.currentStreak)")
+                                .font(.headline.bold())
+                                .foregroundStyle(.orange)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.orange.opacity(0.15))
+                        .clipShape(Capsule())
+                        .transition(.scale.combined(with: .opacity))
+                    }
                 }
-
-                Text("Treinar Palavras")
-                    .font(.title3.bold())
-                    .foregroundStyle(.white)
-
-                Spacer()
+                .padding(.horizontal)
+                .padding(.top)
+                
+                // BARRA DE PROGRESSO FLUIDA
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(Color.white.opacity(0.1))
+                            .frame(height: 6)
+                        
+                        Capsule()
+                            .fill(LinearGradient(
+                                colors: [.purple, .indigo],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ))
+                            .frame(width: geo.size.width * CGFloat(viewModel.progressFraction), height: 6)
+                    }
+                }
+                .frame(height: 6)
+                .padding(.horizontal)
+                .animation(.spring(response: 0.4, dampingFraction: 0.7), value: viewModel.progressFraction)
             }
-            .padding(.horizontal)
-            .padding(.top)
+            .padding(.bottom, 10)
+            .background(Color.black)
 
             // CONTEÚDO SCROLLÁVEL
             ScrollView {
                 VStack(spacing: 24) {
 
-                    // RANKING
+                    // CARD DE DESEMPENHO (Efeito Premium de Vidro Fosco)
                     VStack(spacing: 14) {
-                        Text("🏆 Seu Desempenho")
-                            .font(.headline)
-                            .foregroundStyle(.white)
+                        Text("🏆 Seu Desempenho Histórico")
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.white.opacity(0.6))
 
                         Text("\(successRate)%")
                             .font(.system(size: 44, weight: .bold))
@@ -108,17 +133,23 @@ struct PracticeView: View {
                             .font(.headline)
                             .foregroundStyle(.yellow)
 
-                        Text("\(totalAttempts) tentativas")
+                        Text("\(totalAttempts) tentativas completadas")
                             .font(.caption)
                             .foregroundStyle(.gray)
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color.white.opacity(0.05))
+                    .background(.ultraThinMaterial) // Efeito Blurring Glassmorphism nativo
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    )
 
-                    // ÁREA DE TRADUÇÃO
+                    // CONTROLADOR DA ÁREA PRINCIPAL JOGO / FIM DO CIRCUITO
                     if let word = viewModel.currentWord {
+                        
+                        // ÁREA DE TRADUÇÃO ATIVA
                         VStack(spacing: 16) {
                             Text("Traduza para inglês")
                                 .font(.headline)
@@ -131,56 +162,91 @@ struct PracticeView: View {
 
                             Text(viewModel.formattedAnswer)
                                 .font(.system(size: 34, weight: .bold, design: .rounded))
-                                .foregroundStyle(.green)
+                                .foregroundStyle(viewModel.showResult ? (viewModel.resultMessage.contains("✅") ? .green : .red) : .green)
                                 .multilineTextAlignment(.center)
                         }
+                        .padding(.vertical, 8)
 
+                        // TECLADO CUSTOMIZADO
                         PracticeKeyboardView(
                             answer: viewModel.answer,
                             targetWord: word.englishWord,
-                            onTapLetter: {
-                                viewModel.addLetter($0)
+                            onTapLetter: { letter in
+                                viewModel.addLetter(letter)
                             },
                             onDelete: {
                                 viewModel.removeLastLetter()
                             }
                         )
 
+                        // MENSAGEM DE RESULTADO
                         if viewModel.showResult {
                             Text(viewModel.resultMessage)
-                                .font(.headline)
+                                .font(.title3.bold())
                                 .foregroundStyle(.white)
-                                .padding(.top, 8)
+                                .padding(.top, 4)
+                                .transition(.opacity.combined(with: .slide))
                         }
+                        
+                    } else {
+                        // TELA DE SESSÃO CONCLUÍDA (Quando acabam as palavras do array)
+                        VStack(spacing: 16) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 60))
+                                .foregroundStyle(.yellow)
+                            
+                            Text("Treino Concluído!")
+                                .font(.title2.bold())
+                                .foregroundStyle(.white)
+                            
+                            Text("Você revisou todas as palavras selecionadas para esta rodada.")
+                                .font(.subheadline)
+                                .foregroundStyle(.gray)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 32)
+                        }
+                        .padding(.top, 40)
                     }
 
-                    // PONTUAÇÃO
+                    // PLACAR DE ACERTOS DA SESSÃO ATUAL
                     HStack {
-                        Label(
-                            "\(stats.first?.correctAnswers ?? 0)",
-                            systemImage: "checkmark.circle.fill"
-                        )
-                        .foregroundStyle(.green)
+                        Label("\(viewModel.correctAnswers)", systemImage: "checkmark.circle.fill")
+                            .foregroundStyle(.green)
 
                         Spacer()
 
-                        Label(
-                            "\(stats.first?.wrongAnswers ?? 0)",
-                            systemImage: "xmark.circle.fill"
-                        )
-                        .foregroundStyle(.red)
+                        Label("\(viewModel.wrongAnswers)", systemImage: "xmark.circle.fill")
+                            .foregroundStyle(.red)
                     }
+                    .font(.headline)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 10)
                 }
                 .padding()
             }
 
-            Spacer() // Garante o empurrão do botão para a base da tela
+            Spacer()
 
-            // BOTÃO FIXO EMBAIXO (Fora do ScrollView)
+            // CONTEXTO DE BOTÃO FIXO (Permanente na base)
             VStack(spacing: 0) {
-                if viewModel.showResult {
+                if viewModel.isSessionFinished {
+                    // Botão para sair caso tenha finalizado todas as palavras
                     Button {
-                        viewModel.nextWord()
+                        dismiss()
+                    } label: {
+                        Text("Voltar para o Histórico")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white.opacity(0.15))
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    }
+                } else if viewModel.showResult {
+                    Button {
+                        withAnimation {
+                            viewModel.nextWord()
+                        }
                     } label: {
                         Text("Próxima Palavra")
                             .font(.headline)
@@ -222,7 +288,7 @@ struct PracticeView: View {
             .padding(.horizontal, 20)
             .padding(.top, 12)
             .padding(.bottom, 20)
-            .background(Color.black) // Fundo preto para cobrir o conteúdo que passa por baixo
+            .background(Color.black)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(
