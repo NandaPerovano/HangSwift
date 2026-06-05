@@ -21,7 +21,9 @@ struct HistoryView: View {
 
     var body: some View {
 
-        VStack(spacing: 16) {
+        VStack(spacing: 0) {
+
+            // HEADER
 
             HStack {
 
@@ -43,48 +45,27 @@ struct HistoryView: View {
                 Spacer()
             }
             .padding(.horizontal)
+            .padding(.top)
 
-            NavigationLink {
-
-                PracticeView(
-                    words: history
-                )
-
-            } label: {
-
-                HStack {
-
-                    Image(
-                        systemName: "brain.head.profile"
-                    )
-
-                    Text("Treinar Palavras")
-                        .font(.headline)
-                }
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(.indigo)
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 16
-                    )
-                )
-            }
-            .padding(.horizontal)
+            // LISTA
 
             ScrollView {
 
-                LazyVStack(spacing: 16) {
+                LazyVStack(
+                    spacing: 16
+                ) {
 
                     if history.isEmpty {
 
                         VStack(spacing: 12) {
 
                             Image(
-                                systemName: "text.book.closed"
+                                systemName:
+                                    "text.book.closed"
                             )
-                            .font(.system(size: 40))
+                            .font(
+                                .system(size: 40)
+                            )
                             .foregroundStyle(.gray)
 
                             Text(
@@ -92,7 +73,7 @@ struct HistoryView: View {
                             )
                             .foregroundStyle(.gray)
                         }
-                        .padding(.top, 40)
+                        .padding(.top, 60)
 
                     } else {
 
@@ -105,13 +86,17 @@ struct HistoryView: View {
                                     spacing: 6
                                 ) {
 
-                                    Text(item.englishWord)
-                                        .font(.headline)
-                                        .foregroundStyle(.white)
+                                    Text(
+                                        item.englishWord
+                                    )
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
 
-                                    Text(item.translatedWord)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.gray)
+                                    Text(
+                                        item.translatedWord
+                                    )
+                                    .font(.subheadline)
+                                    .foregroundStyle(.gray)
                                 }
 
                                 Spacer()
@@ -139,11 +124,62 @@ struct HistoryView: View {
                         }
                     }
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
+                .padding()
             }
+
+            // BOTÃO FIXO
+
+            NavigationLink {
+
+                PracticeView(
+                    words: history
+                )
+
+            } label: {
+
+                HStack {
+
+                    Image(
+                        systemName:
+                            "brain.head.profile"
+                    )
+
+                    Text("Treinar Palavras")
+                        .fontWeight(.semibold)
+                }
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    LinearGradient(
+                        colors: [
+                            .indigo,
+                            .purple
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 16
+                    )
+                )
+                .shadow(
+                    color:
+                        .indigo.opacity(0.35),
+                    radius: 12,
+                    x: 0,
+                    y: 8
+                )
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 20)
+            .background(
+                Color.black
+            )
         }
-        .padding(.top)
         .frame(
             maxWidth: .infinity,
             maxHeight: .infinity,
@@ -161,5 +197,8 @@ struct HistoryView: View {
     NavigationStack {
 
         HistoryView()
+            .modelContainer(
+                for: PlayedWord.self
+            )
     }
 }
