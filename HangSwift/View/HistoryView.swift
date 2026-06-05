@@ -40,6 +40,36 @@ struct HistoryView: View {
             }
             .padding(.horizontal)
             
+            NavigationLink {
+
+                PracticeView(
+                    words: history
+                )
+
+            } label: {
+
+                HStack {
+
+                    Image(
+                        systemName:
+                            "brain.head.profile"
+                    )
+
+                    Text("Treinar Palavras")
+                        .font(.headline)
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.indigo)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: 16
+                    )
+                )
+            }
+            .padding(.horizontal)
+            
             // CONTENT
             ScrollView {
                 
