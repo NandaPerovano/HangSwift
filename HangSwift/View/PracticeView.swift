@@ -24,16 +24,14 @@ struct PracticeView: View {
 
     init(words: [PlayedWord]) {
 
-        _viewModel =
-            StateObject(
-                wrappedValue:
-                    PracticeViewModel(
-                        words: words
-                    )
+        _viewModel = StateObject(
+            wrappedValue: PracticeViewModel(
+                words: words
             )
+        )
     }
 
-    // MARK: - Statistics
+    // MARK: - Stats
 
     private var totalAttempts: Int {
 
@@ -41,9 +39,8 @@ struct PracticeView: View {
             return 0
         }
 
-        return
-            stats.correctAnswers +
-            stats.wrongAnswers
+        return stats.correctAnswers +
+               stats.wrongAnswers
     }
 
     private var successRate: Int {
@@ -92,82 +89,202 @@ struct PracticeView: View {
 
     var body: some View {
 
-        ScrollView {
+        VStack(spacing: 0) {
 
-            VStack(spacing: 24) {
+            ScrollView {
 
-                // HEADER
+                VStack(spacing: 24) {
 
-                HStack {
+                    // HEADER
+
+                    HStack {
+
+                        Button {
+
+                            dismiss()
+
+                        } label: {
+
+                            Image(
+                                systemName: "chevron.left"
+                            )
+                            .foregroundStyle(.white)
+                        }
+
+                        Text("Treinar Palavras")
+                            .font(.title3.bold())
+                            .foregroundStyle(.white)
+
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+
+                    // RANKING
+
+                    VStack(spacing: 14) {
+
+                        Text("🏆 Seu Desempenho")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+
+                        Text("\(successRate)%")
+                            .font(
+                                .system(
+                                    size: 44,
+                                    weight: .bold
+                                )
+                            )
+                            .foregroundStyle(.green)
+
+                        Text(ranking)
+                            .font(.headline)
+                            .foregroundStyle(.yellow)
+
+                        Text(
+                            "\(totalAttempts) tentativas"
+                        )
+                        .font(.caption)
+                        .foregroundStyle(.gray)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        Color.white.opacity(0.05)
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: 20
+                        )
+                    )
+                    .padding(.horizontal)
+
+                    if let word = viewModel.currentWord {
+
+                        Text("Traduza para inglês")
+                            .font(.headline)
+                            .foregroundStyle(.gray)
+
+                        Text(word.translatedWord)
+                            .font(
+                                .system(
+                                    size: 36,
+                                    weight: .bold
+                                )
+                            )
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.center)
+
+                        Text(
+                            viewModel.formattedAnswer
+                        )
+                        .font(
+                            .system(
+                                size: 34,
+                                weight: .bold,
+                                design: .rounded
+                            )
+                        )
+                        .foregroundStyle(.green)
+                        .multilineTextAlignment(.center)
+
+                        PracticeKeyboardView(
+
+                            answer:
+                                viewModel.answer,
+
+                            targetWord:
+                                word.englishWord,
+
+                            onTapLetter: {
+
+                                viewModel.addLetter(
+                                    $0
+                                )
+                            },
+
+                            onDelete: {
+
+                                viewModel.removeLastLetter()
+                            }
+                        )
+
+                        if viewModel.showResult {
+
+                            Text(
+                                viewModel.resultMessage
+                            )
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .padding(.top, 8)
+                        }
+                    }
+
+                    // PONTUAÇÃO
+
+                    HStack {
+
+                        Label(
+                            "\(stats.first?.correctAnswers ?? 0)",
+                            systemImage:
+                                "checkmark.circle.fill"
+                        )
+                        .foregroundStyle(.green)
+
+                        Spacer()
+
+                        Label(
+                            "\(stats.first?.wrongAnswers ?? 0)",
+                            systemImage:
+                                "xmark.circle.fill"
+                        )
+                        .foregroundStyle(.red)
+                    }
+                    .padding(.horizontal)
+                }
+                .padding()
+            }
+
+            // BOTÃO FIXO
+
+            Group {
+
+                if viewModel.showResult {
 
                     Button {
 
-                        dismiss()
+                        viewModel.nextWord()
 
                     } label: {
 
-                        Image(
-                            systemName: "chevron.left"
-                        )
-                        .foregroundStyle(.white)
+                        Text("Próxima Palavra")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                LinearGradient(
+                                    colors: [
+                                        .indigo,
+                                        .purple
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 16
+                                )
+                            )
+                            .shadow(
+                                color: .indigo.opacity(0.35),
+                                radius: 12,
+                                x: 0,
+                                y: 8
+                            )
                     }
 
-                    Text("Treinar Palavras")
-                        .font(.title3.bold())
-                        .foregroundStyle(.white)
-
-                    Spacer()
-                }
-                .padding(.horizontal)
-
-                if let word = viewModel.currentWord {
-
-                    Text("Traduza para inglês")
-                        .font(.headline)
-                        .foregroundStyle(.gray)
-
-                    Text(word.translatedWord)
-                        .font(
-                            .system(
-                                size: 36,
-                                weight: .bold
-                            )
-                        )
-                        .foregroundStyle(.white)
-
-                    Text(
-                        viewModel.formattedAnswer
-                    )
-                    .font(
-                        .system(
-                            size: 34,
-                            weight: .bold,
-                            design: .rounded
-                        )
-                    )
-                    .foregroundStyle(.green)
-                    .multilineTextAlignment(.center)
-
-                    PracticeKeyboardView(
-
-                        answer:
-                            viewModel.answer,
-
-                        targetWord:
-                            word.englishWord,
-
-                        onTapLetter: {
-
-                            viewModel.addLetter(
-                                $0
-                            )
-                        },
-
-                        onDelete: {
-
-                            viewModel.removeLastLetter()
-                        }
-                    )
+                } else {
 
                     Button {
 
@@ -183,160 +300,42 @@ struct PracticeView: View {
                         Text("Verificar")
                             .font(.headline)
                             .foregroundStyle(.white)
-                            .frame(
-                                maxWidth: .infinity
-                            )
+                            .frame(maxWidth: .infinity)
                             .padding()
-                            .background(.indigo)
+                            .background(
+                                LinearGradient(
+                                    colors: [
+                                        .indigo,
+                                        .purple
+                                    ],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
                             .clipShape(
                                 RoundedRectangle(
                                     cornerRadius: 16
                                 )
                             )
-                    }
-
-                    if viewModel.showResult {
-
-                        VStack(spacing: 12) {
-
-                            Text(
-                                viewModel.resultMessage
+                            .shadow(
+                                color: .indigo.opacity(0.35),
+                                radius: 12,
+                                x: 0,
+                                y: 8
                             )
-                            .foregroundStyle(.white)
-
-                            Button {
-
-                                viewModel.nextWord()
-
-                            } label: {
-
-                                Text(
-                                    "Próxima Palavra"
-                                )
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .frame(
-                                    maxWidth: .infinity
-                                )
-                                .padding()
-                                .background(.green)
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 16
-                                    )
-                                )
-                            }
-                        }
                     }
                 }
-
-                Divider()
-                    .overlay(.gray.opacity(0.3))
-                    .padding(.vertical)
-
-                // CONTADORES
-
-                if let stats = stats.first {
-
-                    HStack {
-
-                        Label(
-                            "\(stats.correctAnswers)",
-                            systemImage:
-                                "checkmark.circle.fill"
-                        )
-                        .foregroundStyle(.green)
-
-                        Spacer()
-
-                        Label(
-                            "\(stats.wrongAnswers)",
-                            systemImage:
-                                "xmark.circle.fill"
-                        )
-                        .foregroundStyle(.red)
-                    }
-                    .padding(.horizontal)
-
-                } else {
-
-                    HStack {
-
-                        Label(
-                            "0",
-                            systemImage:
-                                "checkmark.circle.fill"
-                        )
-                        .foregroundStyle(.green)
-
-                        Spacer()
-
-                        Label(
-                            "0",
-                            systemImage:
-                                "xmark.circle.fill"
-                        )
-                        .foregroundStyle(.red)
-                    }
-                    .padding(.horizontal)
-                }
-
-                // CARD DE DESEMPENHO
-
-                VStack(spacing: 14) {
-
-                    Text("🏆 Seu Desempenho")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-
-                    Text("\(successRate)%")
-                        .font(
-                            .system(
-                                size: 48,
-                                weight: .bold
-                            )
-                        )
-                        .foregroundStyle(.green)
-
-                    Text("Taxa de acerto")
-                        .foregroundStyle(.gray)
-
-                    Divider()
-                        .overlay(
-                            .gray.opacity(0.3)
-                        )
-
-                    Text(ranking)
-                        .font(.title3.bold())
-                        .foregroundStyle(.yellow)
-
-                    Text(
-                        "\(totalAttempts) tentativas realizadas"
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.gray)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(
-                    Color.white.opacity(0.05)
-                )
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: 20
-                    )
-                )
-                .padding(.horizontal)
             }
-            .padding()
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 20)
+            .background(Color.black)
         }
         .background(
             Color.black.ignoresSafeArea()
         )
         .navigationBarHidden(true)
     }
-
-    // MARK: - Persistence
 
     private func updateStats(
         correct: Bool
