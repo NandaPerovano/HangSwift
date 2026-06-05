@@ -18,7 +18,10 @@ struct HangSwiftApp: App {
             HomeView()
         }
         .modelContainer(
-            for: PlayedWord.self
+            for: [
+                PlayedWord.self,
+                PracticeStats.self
+            ]
         )
     }
 }

@@ -11,19 +11,23 @@ import Foundation
 final class PracticeViewModel: ObservableObject {
 
     @Published var currentWord: PlayedWord?
+
     @Published var answer = ""
 
     @Published var resultMessage = ""
+
     @Published var showResult = false
 
     @Published var correctAnswers = 0
+
     @Published var wrongAnswers = 0
 
     private var words: [PlayedWord]
 
     init(words: [PlayedWord]) {
 
-        self.words = words.shuffled()
+        self.words =
+            words.shuffled()
 
         loadNextWord()
     }
@@ -34,25 +38,32 @@ final class PracticeViewModel: ObservableObject {
             return ""
         }
 
-        let word = currentWord.englishWord
+        let word =
+            currentWord.englishWord
 
-        guard let firstLetter = word.first else {
+        guard let firstLetter =
+                word.first else {
             return ""
         }
 
         var display: [String] = [
+
             String(firstLetter)
         ]
 
-        let typedLetters = Array(answer)
+        let typedLetters =
+            Array(answer)
 
         for index in 1..<word.count {
 
-            let answerIndex = index - 1
+            let answerIndex =
+                index - 1
 
-            if answerIndex < typedLetters.count {
+            if answerIndex
+                < typedLetters.count {
 
                 display.append(
+
                     String(
                         typedLetters[
                             answerIndex
@@ -66,19 +77,26 @@ final class PracticeViewModel: ObservableObject {
             }
         }
 
-        return display.joined(separator: " ")
+        return display.joined(
+            separator: " "
+        )
     }
 
-    func addLetter(_ letter: String) {
+    func addLetter(
+        _ letter: String
+    ) {
 
         guard let currentWord else {
             return
         }
 
         let maxLetters =
-            currentWord.englishWord.count - 1
+            currentWord
+            .englishWord
+            .count - 1
 
-        guard answer.count < maxLetters else {
+        guard answer.count
+                < maxLetters else {
             return
         }
 
@@ -94,26 +112,38 @@ final class PracticeViewModel: ObservableObject {
         answer.removeLast()
     }
 
-    func checkAnswer() {
+    @discardableResult
+    func checkAnswer() -> Bool {
 
         guard let currentWord else {
-            return
+            return false
         }
 
         let fullAnswer =
+
             String(
-                currentWord.englishWord.prefix(1)
+                currentWord
+                    .englishWord
+                    .prefix(1)
             ) + answer
 
         let isCorrect =
-            fullAnswer.lowercased()
+
+            fullAnswer
+            .lowercased()
+
             ==
-            currentWord.englishWord.lowercased()
+
+            currentWord
+            .englishWord
+            .lowercased()
 
         if isCorrect {
 
             correctAnswers += 1
-            resultMessage = "✅ Correto!"
+
+            resultMessage =
+                "✅ Correto!"
 
         } else {
 
@@ -124,11 +154,14 @@ final class PracticeViewModel: ObservableObject {
         }
 
         showResult = true
+
+        return isCorrect
     }
 
     func nextWord() {
 
         answer = ""
+
         showResult = false
 
         loadNextWord()
@@ -136,6 +169,7 @@ final class PracticeViewModel: ObservableObject {
 
     private func loadNextWord() {
 
-        currentWord = words.randomElement()
+        currentWord =
+            words.randomElement()
     }
 }
