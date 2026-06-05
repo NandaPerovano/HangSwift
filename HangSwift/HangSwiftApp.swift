@@ -6,12 +6,19 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct HangSwiftApp: App {
+
     var body: some Scene {
+
         WindowGroup {
+
             HomeView()
         }
+        .modelContainer(
+            for: PlayedWord.self
+        )
     }
 }

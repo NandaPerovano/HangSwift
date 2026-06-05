@@ -6,40 +6,44 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HistoryView: View {
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
-    let history: [HistoryItem]
-    
+
+    @Query(
+        sort: \PlayedWord.playedAt,
+        order: .reverse
+    )
+    private var history: [PlayedWord]
+
     var body: some View {
-        
+
         VStack(spacing: 16) {
-            
-            // HEADER
+
             HStack {
-                
+
                 Button {
-                    
+
                     dismiss()
-                    
+
                 } label: {
-                    
+
                     Image(systemName: "chevron.left")
                         .font(.headline)
                         .foregroundStyle(.white)
                 }
-                
+
                 Text("Suas Palavras")
                     .font(.title3.bold())
                     .foregroundStyle(.white)
-                
+
                 Spacer()
             }
             .padding(.horizontal)
-            
+
             NavigationLink {
 
                 PracticeView(
@@ -51,8 +55,7 @@ struct HistoryView: View {
                 HStack {
 
                     Image(
-                        systemName:
-                            "brain.head.profile"
+                        systemName: "brain.head.profile"
                     )
 
                     Text("Treinar Palavras")
@@ -69,54 +72,50 @@ struct HistoryView: View {
                 )
             }
             .padding(.horizontal)
-            
-            // CONTENT
+
             ScrollView {
-                
-                LazyVStack(
-                    spacing: 16
-                ) {
-                    
+
+                LazyVStack(spacing: 16) {
+
                     if history.isEmpty {
-                        
+
                         VStack(spacing: 12) {
-                            
+
                             Image(
-                                systemName:
-                                    "text.book.closed"
+                                systemName: "text.book.closed"
                             )
                             .font(.system(size: 40))
                             .foregroundStyle(.gray)
-                            
+
                             Text(
                                 "Nenhuma palavra jogada ainda"
                             )
                             .foregroundStyle(.gray)
                         }
                         .padding(.top, 40)
-                        
+
                     } else {
-                        
+
                         ForEach(history) { item in
-                            
+
                             HStack {
-                                
+
                                 VStack(
                                     alignment: .leading,
                                     spacing: 6
                                 ) {
-                                    
+
                                     Text(item.englishWord)
                                         .font(.headline)
                                         .foregroundStyle(.white)
-                                    
+
                                     Text(item.translatedWord)
                                         .font(.subheadline)
                                         .foregroundStyle(.gray)
                                 }
-                                
+
                                 Spacer()
-                                
+
                                 Circle()
                                     .fill(
                                         item.isCorrect
@@ -158,17 +157,9 @@ struct HistoryView: View {
 }
 
 #Preview {
-    
+
     NavigationStack {
-        
-        HistoryView(
-            history: [
-                HistoryItem(
-                    englishWord: "ALIENATION",
-                    translatedWord: "ALIENAÇÃO",
-                    isCorrect: false
-                )
-            ]
-        )
+
+        HistoryView()
     }
 }

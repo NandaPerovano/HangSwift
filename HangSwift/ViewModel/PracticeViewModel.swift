@@ -10,7 +10,7 @@ import Foundation
 @MainActor
 final class PracticeViewModel: ObservableObject {
 
-    @Published var currentWord: HistoryItem?
+    @Published var currentWord: PlayedWord?
     @Published var answer = ""
 
     @Published var resultMessage = ""
@@ -19,9 +19,9 @@ final class PracticeViewModel: ObservableObject {
     @Published var correctAnswers = 0
     @Published var wrongAnswers = 0
 
-    private var words: [HistoryItem]
+    private var words: [PlayedWord]
 
-    init(words: [HistoryItem]) {
+    init(words: [PlayedWord]) {
 
         self.words = words.shuffled()
 

@@ -6,14 +6,21 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct GameView: View {
 
     @Environment(\.dismiss)
     private var dismiss
 
+    @Environment(\.modelContext)
+    private var modelContext
+
     @StateObject
     private var viewModel = HangmanViewModel()
+
+    @State
+    private var hasSavedWord = false
 
     var body: some View {
 
@@ -39,9 +46,7 @@ struct GameView: View {
 
                     NavigationLink {
 
-                        HistoryView(
-                            history: viewModel.history
-                        )
+                        HistoryView()
 
                     } label: {
 
@@ -60,6 +65,7 @@ struct GameView: View {
 
                     Button {
 
+                        hasSavedWord = false
                         viewModel.restartGame()
 
                     } label: {
@@ -83,7 +89,6 @@ struct GameView: View {
             )
             .frame(height: 220)
 
-            // PALAVRA
             Text(
                 viewModel.isGameLost
                 ? viewModel.game.word
@@ -107,23 +112,18 @@ struct GameView: View {
                 : 8
             )
             .foregroundStyle(
-
                 viewModel.isGameWon
                 ? .green
-
                 : viewModel.isGameLost
                 ? .red
-
                 : .white
             )
             .shadow(
                 color:
                     viewModel.isGameWon
                     ? .green.opacity(0.7)
-
                     : viewModel.isGameLost
                     ? .red.opacity(0.7)
-
                     : .white.opacity(0.2),
                 radius: 12
             )
@@ -133,10 +133,6 @@ struct GameView: View {
                 : 1
             )
             .padding(.vertical, 24)
-            .animation(
-                .easeInOut,
-                value: viewModel.isGameLost
-            )
 
             LetterKeyboardView(
                 guessedLetters: viewModel.game.guessedLetters,
@@ -145,10 +141,11 @@ struct GameView: View {
                     viewModel.guess(
                         letter: letter
                     )
+
+                    saveWordIfNeeded()
                 }
             )
 
-            // TRADUÇÃO
             if viewModel.isGameWon || viewModel.isGameLost {
 
                 VStack(spacing: 6) {
@@ -168,7 +165,6 @@ struct GameView: View {
                         .foregroundStyle(.white)
                 }
                 .padding(.top, 16)
-                .transition(.opacity)
             }
 
             Spacer()
@@ -189,6 +185,7 @@ struct GameView: View {
 
             Button("Jogar novamente") {
 
+                hasSavedWord = false
                 viewModel.restartGame()
             }
 
@@ -204,6 +201,28 @@ struct GameView: View {
             )
         }
     }
+
+    private func saveWordIfNeeded() {
+
+        guard
+            !hasSavedWord,
+            viewModel.isGameWon || viewModel.isGameLost
+        else {
+            return
+        }
+
+        let playedWord = PlayedWord(
+            englishWord: viewModel.game.word,
+            translatedWord: viewModel.translatedWord,
+            isCorrect: viewModel.isGameWon
+        )
+
+        modelContext.insert(
+            playedWord
+        )
+
+        hasSavedWord = true
+    }
 }
 
 #Preview {
@@ -211,5 +230,8 @@ struct GameView: View {
     NavigationStack {
 
         GameView()
+            .modelContainer(
+                for: PlayedWord.self
+            )
     }
 }

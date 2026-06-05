@@ -15,7 +15,7 @@ struct PracticeView: View {
     @StateObject
     private var viewModel: PracticeViewModel
 
-    init(words: [HistoryItem]) {
+    init(words: [PlayedWord]) {
 
         _viewModel =
             StateObject(
@@ -78,19 +78,12 @@ struct PracticeView: View {
                     .foregroundStyle(.green)
 
                 PracticeKeyboardView(
-
                     answer: viewModel.answer,
-
-                    targetWord:
-                        word.englishWord,
-
+                    targetWord: word.englishWord,
                     onTapLetter: {
-
                         viewModel.addLetter($0)
                     },
-
                     onDelete: {
-
                         viewModel.removeLastLetter()
                     }
                 )
